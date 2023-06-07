@@ -42,9 +42,10 @@ async function run() {
 
 
     let userCollection = client.db('Athlete_Escapes').collection('users');
+    let classCollection = client.db('Athlete_Escapes').collection('classes');
 
     
-    // Verify APIS
+    // Verify //////////////////////////////////////////////////////////////////////////////////
 
     let verifyAdmin = async (req, res, next)=>{
       let email = req.decoded.email
@@ -52,6 +53,16 @@ async function run() {
       let query = { email : email}
       let user = await userCollection.findOne(query);
       if(user?.role != 'admin'){
+        return res.status(403).send({err: true, msg: 'forbidden'})
+      }
+      next();
+    }
+    let verifyInstructors = async (req, res, next)=>{
+      let email = req.decoded.email
+      // console.log(email);
+      let query = { email : email}
+      let user = await userCollection.findOne(query);
+      if(user?.role != 'instructor'){
         return res.status(403).send({err: true, msg: 'forbidden'})
       }
       next();
@@ -73,7 +84,7 @@ async function run() {
       res.send(result);
     })
     
-    //JWT APIS
+    //JWT APIS//////////////////////////////////////////////////////////////////////////////////
 
 
 
@@ -85,7 +96,7 @@ async function run() {
 
     })
 
-    // Users APIS
+    // Users APIS////////////////////////////////////////////////////////////////////////////////////
 
     app.post('/users', async (req, res)=>{
       let user = req.body;
@@ -144,12 +155,31 @@ async function run() {
 
     })
 
+   
     app.get('/instructors', async (req, res)=>{
         let filter = { role : 'instructor'}
         let result = await userCollection.find(filter).toArray()
         res.send(result)
     })
 
+    // Classes APIS /////////////////////////////////////////////////////////////////////
+
+    app.post('/classes',verifyJWT, verifyInstructors, async (req, res)=>{
+      let newClass = req.body;
+      let result = await classCollection.insertOne(newClass)
+
+      res.send(result)
+
+    })
+
+
+    app.get('/classes', verifyJWT, verifyAdmin, async (req, res)=>{
+      let result = await classCollection.find().toArray()
+      res.send(result)
+    })
+
+    
+    
 
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
