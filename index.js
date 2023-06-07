@@ -8,7 +8,7 @@ app.use(cors())
 app.use(express.json())
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_U}:${process.env.DB_P}@cluster0.rohhp7w.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -26,6 +26,9 @@ async function run() {
 
     let userCollection = client.db('Athlete_Escapes').collection('users');
 
+
+    // Users APIS
+
     app.post('/users', async (req, res)=>{
       let user = req.body;
       let query = {email : user.email};
@@ -37,6 +40,53 @@ async function run() {
       res.send(result);
       
     })
+
+    app.get('/users', async (req, res)=>{
+      let result = await userCollection.find().toArray();
+      res.send(result)
+    })
+
+    app.put('/users/a/:id', async (req, res)=>{
+      let id = req.params.id;
+      // console.log(id);
+      let filter = { _id : new ObjectId(id)};
+      let updateRole = {
+        $set: {
+          role : 'admin'
+        }
+      }
+      let result = await userCollection.updateOne(filter, updateRole);
+      res.send(result);
+
+    })
+    app.put('/users/s/:id', async (req, res)=>{
+      let id = req.params.id;
+      // console.log(id);
+      let filter = { _id : new ObjectId(id)};
+      let updateRole = {
+        $set: {
+          role : 'student'
+        }
+      }
+      let result = await userCollection.updateOne(filter, updateRole);
+      res.send(result);
+
+    })
+    app.put('/users/i/:id', async (req, res)=>{
+      let id = req.params.id;
+      // console.log(id);
+      let filter = { _id : new ObjectId(id)};
+      let updateRole = {
+        $set: {
+          role : 'instructor'
+        }
+      }
+      let result = await userCollection.updateOne(filter, updateRole);
+      res.send(result);
+
+    })
+
+
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
     // Send a ping to confirm a successful connection
