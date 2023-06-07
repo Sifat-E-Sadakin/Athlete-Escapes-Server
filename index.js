@@ -64,6 +64,14 @@ async function run() {
       let result = { isAdmin : user?.role == 'admin'}
       res.send(result);
     })
+
+    app.get('/isInstructor/:email', async (req, res)=>{
+      let mail = req.params.email;
+      let filter = {email : mail}
+      let user = await userCollection.findOne(filter);
+      let result = { isInstructor : user?.role == 'instructor'}
+      res.send(result);
+    })
     
     //JWT APIS
 
