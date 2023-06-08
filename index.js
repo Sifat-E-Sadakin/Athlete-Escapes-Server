@@ -89,7 +89,7 @@ async function run() {
 
 
     app.post('/jwt', (req, res)=>{
-      // console.log('hit jwt');
+      //  console.log('hit jwt');
       let user = req.body;
       let token = jwt.sign(user, process.env.WEB_TOKEN, {expiresIn: '1h'} )
       res.send({token})
