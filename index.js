@@ -43,6 +43,7 @@ async function run() {
 
     let userCollection = client.db('Athlete_Escapes').collection('users');
     let classCollection = client.db('Athlete_Escapes').collection('classes');
+    let bookedClassCollection = client.db('Athlete_Escapes').collection('Booked_classes');
 
     
     // Verify //////////////////////////////////////////////////////////////////////////////////
@@ -186,6 +187,40 @@ async function run() {
       let result = await classCollection.find().toArray()
       res.send(result)
     })
+   
+    app.get('/classes/approved',  async (req, res)=>{
+      let filter ={ status : 'approved'}
+      let result = await classCollection.find(filter).toArray()
+
+      res.send(result)
+    })
+
+    app.patch('/addClass/:id', async(req, res)=>{
+    
+      let id = req.params.id;
+      let filter = {_id : new ObjectId(id)};
+      let currentClass = await classCollection.findOne(filter)
+      // console.log(currentClass);
+      if(currentClass){
+        let addStudent = {
+          $set : {
+            student : currentClass?.student + 1,
+            seat : currentClass?.seat - 1
+          }
+        }
+        let result = await classCollection.updateOne(filter, addStudent)
+      res.send(result)
+      }
+     
+     
+    })
+
+    app.post('/addClass', async(req, res)=>{
+      let getClass = req.body;
+      let result = await bookedClassCollection.insertOne(getClass)
+      res.send(result)
+    })
+
 
     app.put('/classes/approve/:id', verifyJWT, verifyAdmin, async(req, res)=>{
       let id = req.params.id;
