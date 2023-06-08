@@ -178,6 +178,46 @@ async function run() {
       res.send(result)
     })
 
+    app.put('/classes/approve/:id', verifyJWT, verifyAdmin, async(req, res)=>{
+      let id = req.params.id;
+      let filter = {_id : new ObjectId(id)}
+      // let getClass = await classCollection.findOne(filter);
+      let updateStatus = {
+        $set : {
+          status : 'approved'
+        }
+      }
+      let result = await classCollection.updateOne(filter,updateStatus)
+      res.send(result)
+    })
+    
+    app.put('/classes/deny/:id', verifyJWT, verifyAdmin, async(req, res)=>{
+      let id = req.params.id;
+      let filter = {_id : new ObjectId(id)}
+      // let getClass = await classCollection.findOne(filter);
+      let updateStatus = {
+        $set : {
+          status : 'denied'
+        }
+      }
+      let result = await classCollection.updateOne(filter,updateStatus)
+      res.send(result)
+    })
+    
+    app.put('/classes/feedback/:id', verifyJWT, verifyAdmin, async(req, res)=>{
+      let id = req.params.id;
+      let feedback = req.body;
+      let filter = {_id : new ObjectId(id)}
+      // let getClass = await classCollection.findOne(filter);
+      let updateStatus = {
+        $set : {
+          feedback : feedback.feedback
+        }
+      }
+      let result = await classCollection.updateOne(filter,updateStatus)
+      res.send(result)
+    })
+
     
     
 
