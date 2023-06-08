@@ -162,6 +162,15 @@ async function run() {
         res.send(result)
     })
 
+    app.get('/instructorClass', async(req, res)=>{
+      let mail = req.query.email
+      // console.log(mail);
+      let filter = {email : mail};
+      let result = await classCollection.find(filter).toArray();
+      res.send(result)
+
+    })
+
     // Classes APIS /////////////////////////////////////////////////////////////////////
 
     app.post('/classes',verifyJWT, verifyInstructors, async (req, res)=>{
