@@ -281,6 +281,16 @@ async function run() {
       let result = await bookedClassCollection.deleteMany(filter);
       res.send(result)
     })
+    
+    app.delete('/bookedClasses/:id', async(req, res)=>{
+    
+      let id = req.params.id
+     
+      let filter = { _id : new ObjectId(id)}
+      
+       let result = await bookedClassCollection.deleteOne(filter);
+       res.send(result)
+    })
 
     // confirmed class APIS /////////////////////////////////////////////////////////////
 
