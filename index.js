@@ -45,6 +45,7 @@ async function run() {
     let userCollection = client.db('Athlete_Escapes').collection('users');
     let classCollection = client.db('Athlete_Escapes').collection('classes');
     let bookedClassCollection = client.db('Athlete_Escapes').collection('Booked_classes');
+    let confirmedClassCollection = client.db('Athlete_Escapes').collection('Confirmed_classes');
 
     
     // Verify //////////////////////////////////////////////////////////////////////////////////
@@ -205,6 +206,7 @@ async function run() {
       if(currentClass){
         let addStudent = {
           $set : {
+            
             student : currentClass?.student + 1,
             seat : currentClass?.seat - 1
           }
@@ -272,6 +274,30 @@ async function run() {
       let result = await bookedClassCollection.find(filter).toArray();
       res.send(result)
     })
+
+    app.delete('/bookedClasses', async(req, res)=>{
+      let mail = req.query.email
+      let filter = {email : mail}
+      let result = await bookedClassCollection.deleteMany(filter);
+      res.send(result)
+    })
+
+    // confirmed class APIS /////////////////////////////////////////////////////////////
+
+    app.post('/confirmedClasses', async(req, res)=>{
+      let getClass = req.body;
+      let result = await confirmedClassCollection.insertMany(getClass)
+      res.send(result)
+    })
+    
+    app.get('/confirmedClasses', async(req, res)=>{
+      let mail = req.query.email
+      let filter = {email : mail}
+      let result = await confirmedClassCollection.find(filter).toArray();
+      res.send(result)
+    })
+
+
 
     // Payment APIS /////////////////////////////////////////////////////////////////////
 
