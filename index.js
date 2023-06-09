@@ -3,6 +3,7 @@ const app = express()
 const cors = require('cors')
 require('dotenv').config()
 const jwt = require('jsonwebtoken');
+const stripe = require("stripe")(process.env.PAY_KEY);
 const port = process.env.PORT || 3000 
 
 app.use(cors())
@@ -257,7 +258,7 @@ async function run() {
       res.send(result)
     })
 
-    // Booked Class APIS
+    // Booked Class APIS /////////////////////////////////////////////////////////////////
     app.post('/addClass', async(req, res)=>{
       let getClass = req.body;
       let result = await bookedClassCollection.insertOne(getClass)
@@ -271,6 +272,28 @@ async function run() {
       let result = await bookedClassCollection.find(filter).toArray();
       res.send(result)
     })
+
+    // Payment APIS /////////////////////////////////////////////////////////////////////
+
+    app.post("/create-payment-intent", async (req, res) => {
+      const { price } = req.body;
+
+      let fees = price * 100
+    
+      // Create a PaymentIntent with the order amount and currency
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: fees,
+        currency: "usd",
+        automatic_payment_methods: {
+          enabled: true,
+        },
+      });
+    
+      res.send({
+        clientSecret: paymentIntent.client_secret,
+      });
+    });
+
 
     
     
