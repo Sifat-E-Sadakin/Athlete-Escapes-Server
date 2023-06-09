@@ -215,12 +215,7 @@ async function run() {
      
     })
 
-    app.post('/addClass', async(req, res)=>{
-      let getClass = req.body;
-      let result = await bookedClassCollection.insertOne(getClass)
-      res.send(result)
-    })
-
+   
 
     app.put('/classes/approve/:id', verifyJWT, verifyAdmin, async(req, res)=>{
       let id = req.params.id;
@@ -259,6 +254,21 @@ async function run() {
         }
       }
       let result = await classCollection.updateOne(filter,updateStatus)
+      res.send(result)
+    })
+
+    // Booked Class APIS
+    app.post('/addClass', async(req, res)=>{
+      let getClass = req.body;
+      let result = await bookedClassCollection.insertOne(getClass)
+      res.send(result)
+    })
+
+
+    app.get('/bookedClasses', async(req, res)=>{
+      let mail = req.query.email
+      let filter = {email : mail}
+      let result = await bookedClassCollection.find(filter).toArray();
       res.send(result)
     })
 
