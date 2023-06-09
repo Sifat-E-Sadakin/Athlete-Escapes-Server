@@ -274,6 +274,13 @@ async function run() {
       let result = await bookedClassCollection.find(filter).toArray();
       res.send(result)
     })
+    
+    app.get('/bookedClassesForPayment/:id', async(req, res)=>{
+      let id = req.params.id
+      let filter = {_id: new ObjectId(id)}
+      let result = await bookedClassCollection.findOne(filter)
+      res.send(result)
+    })
 
     app.delete('/bookedClasses', async(req, res)=>{
       let mail = req.query.email
@@ -296,7 +303,7 @@ async function run() {
 
     app.post('/confirmedClasses', async(req, res)=>{
       let getClass = req.body;
-      let result = await confirmedClassCollection.insertMany(getClass)
+      let result = await confirmedClassCollection.insertOne(getClass)
       res.send(result)
     })
     
@@ -317,17 +324,19 @@ async function run() {
       let fees = price * 100
     
       // Create a PaymentIntent with the order amount and currency
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount: fees,
-        currency: "usd",
-        automatic_payment_methods: {
-          enabled: true,
-        },
-      });
-    
-      res.send({
-        clientSecret: paymentIntent.client_secret,
-      });
+      if (fees >0){
+        const paymentIntent = await stripe.paymentIntents.create({
+          amount: fees,
+          currency: "usd",
+          automatic_payment_methods: {
+            enabled: true,
+          },
+        });
+      
+        res.send({
+          clientSecret: paymentIntent.client_secret,
+        });
+      }
     });
 
 
