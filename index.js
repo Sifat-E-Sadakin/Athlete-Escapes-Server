@@ -46,6 +46,7 @@ async function run() {
     let classCollection = client.db('Athlete_Escapes').collection('classes');
     let bookedClassCollection = client.db('Athlete_Escapes').collection('Booked_classes');
     let confirmedClassCollection = client.db('Athlete_Escapes').collection('Confirmed_classes');
+    let paymentHistoryCollection = client.db('Athlete_Escapes').collection('Payment_History');
 
     
     // Verify //////////////////////////////////////////////////////////////////////////////////
@@ -282,12 +283,12 @@ async function run() {
       res.send(result)
     })
 
-    app.delete('/bookedClasses', async(req, res)=>{
-      let mail = req.query.email
-      let filter = {email : mail}
-      let result = await bookedClassCollection.deleteMany(filter);
-      res.send(result)
-    })
+    // app.delete('/bookedClasses', async(req, res)=>{
+    //   let mail = req.query.email
+    //   let filter = {email : mail}
+    //   let result = await bookedClassCollection.deleteMany(filter);
+    //   res.send(result)
+    // })
     
     app.delete('/bookedClasses/:id', async(req, res)=>{
     
@@ -338,6 +339,21 @@ async function run() {
         });
       }
     });
+
+    app.post('/paymentHistory' , async (req, res)=>{
+      let paymentDetails  = req.body;
+      let result = await paymentHistoryCollection.insertOne(paymentDetails);
+      res.send(result) 
+    })
+
+    app.get('/paymentHistory', async (req, res)=>{
+      let mail = req.query.email
+      let filter = {email : mail }
+      let sort = {time: -1}
+      let result = await paymentHistoryCollection.find(filter).sort(sort).toArray();
+
+      res.send(result)
+    })
 
 
     
