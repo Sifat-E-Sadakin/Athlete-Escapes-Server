@@ -197,6 +197,14 @@ async function run() {
 
       res.send(result)
     })
+   
+    app.get('/popularClasses',  async (req, res)=>{
+      let filter ={ status : 'approved'}
+      let sort = {student : -1}
+      let result = await classCollection.find(filter).sort(sort).toArray()
+
+      res.send(result)
+    })
 
     app.patch('/addClass/:id', async(req, res)=>{
     
@@ -351,6 +359,14 @@ async function run() {
       let filter = {email : mail }
       let sort = {time: -1}
       let result = await paymentHistoryCollection.find(filter).sort(sort).toArray();
+
+      res.send(result)
+    })
+   
+    app.get('/allPaymentHistory', async (req, res)=>{
+     
+      let sort = {time: -1}
+      let result = await paymentHistoryCollection.find().sort(sort).toArray();
 
       res.send(result)
     })
