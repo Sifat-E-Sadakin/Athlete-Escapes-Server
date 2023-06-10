@@ -301,6 +301,7 @@ async function run() {
     app.delete('/bookedClasses/:id', async(req, res)=>{
     
       let id = req.params.id
+      // let mail = req.query.email
      
       let filter = { _id : new ObjectId(id)}
       
