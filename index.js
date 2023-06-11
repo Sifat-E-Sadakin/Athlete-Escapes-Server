@@ -119,7 +119,7 @@ async function run() {
       res.send(result)
     })
 
-    app.put('/users/a/:id', async (req, res)=>{
+    app.put('/users/a/:id',verifyJWT,verifyAdmin, async (req, res)=>{
       let id = req.params.id;
       // console.log(id);
       let filter = { _id : new ObjectId(id)};
@@ -132,7 +132,7 @@ async function run() {
       res.send(result);
 
     })
-    app.put('/users/s/:id', async (req, res)=>{
+    app.put('/users/s/:id', verifyJWT, verifyAdmin, async (req, res)=>{
       let id = req.params.id;
       // console.log(id);
       let filter = { _id : new ObjectId(id)};
@@ -145,7 +145,7 @@ async function run() {
       res.send(result);
 
     })
-    app.put('/users/i/:id', async (req, res)=>{
+    app.put('/users/i/:id', verifyJWT, verifyAdmin, async (req, res)=>{
       let id = req.params.id;
       // console.log(id);
       let filter = { _id : new ObjectId(id)};
@@ -166,12 +166,43 @@ async function run() {
         res.send(result)
     })
 
-    app.get('/instructorClass', async(req, res)=>{
+    app.get('/instructorClass', verifyJWT,verifyInstructors, async(req, res)=>{
       let mail = req.query.email
       // console.log(mail);
       let filter = {email : mail};
       let result = await classCollection.find(filter).toArray();
       res.send(result)
+
+    })
+
+    app.get('/instructorClassById/:id', verifyJWT,verifyInstructors, async(req, res)=>{
+      let id = req.params.id
+      // console.log(mail);
+      let filter = { _id : new ObjectId(id)}
+      let result = await classCollection.findOne(filter)
+      res.send(result)
+
+    })
+
+    app.put('/updateClass/:id',verifyJWT, verifyInstructors, async (req, res)=>{
+      let id = req.params.id;
+      let filter = { _id : new ObjectId(id)}
+      let newInfo = req.body
+      const options = { upsert: true };
+        let updateClass = {
+          $set : {
+            price : newInfo.price,
+            description : newInfo.description,
+            seat : newInfo.seat ,
+
+          }
+        }
+      
+        let result = await classCollection.updateOne(filter, updateClass, options)
+        res.send(result)
+
+      
+     
 
     })
 
@@ -206,7 +237,7 @@ async function run() {
       res.send(result)
     })
 
-    app.patch('/addClass/:id', async(req, res)=>{
+    app.patch('/addClass/:id', verifyJWT, async(req, res)=>{
     
       let id = req.params.id;
       let filter = {_id : new ObjectId(id)};
@@ -270,21 +301,21 @@ async function run() {
     })
 
     // Booked Class APIS /////////////////////////////////////////////////////////////////
-    app.post('/addClass', async(req, res)=>{
+    app.post('/addClass',verifyJWT, async(req, res)=>{
       let getClass = req.body;
       let result = await bookedClassCollection.insertOne(getClass)
       res.send(result)
     })
 
 
-    app.get('/bookedClasses', async(req, res)=>{
+    app.get('/bookedClasses', verifyJWT, async(req, res)=>{
       let mail = req.query.email
       let filter = {email : mail}
       let result = await bookedClassCollection.find(filter).toArray();
       res.send(result)
     })
     
-    app.get('/bookedClassesForPayment/:id', async(req, res)=>{
+    app.get('/bookedClassesForPayment/:id', verifyJWT, async(req, res)=>{
       let id = req.params.id
       let filter = {_id: new ObjectId(id)}
       let result = await bookedClassCollection.findOne(filter)
@@ -298,7 +329,7 @@ async function run() {
     //   res.send(result)
     // })
     
-    app.delete('/bookedClasses/:id', async(req, res)=>{
+    app.delete('/bookedClasses/:id', verifyJWT, async(req, res)=>{
     
       let id = req.params.id
       // let mail = req.query.email
@@ -311,13 +342,13 @@ async function run() {
 
     // confirmed class APIS /////////////////////////////////////////////////////////////
 
-    app.post('/confirmedClasses', async(req, res)=>{
+    app.post('/confirmedClasses', verifyJWT, async(req, res)=>{
       let getClass = req.body;
       let result = await confirmedClassCollection.insertOne(getClass)
       res.send(result)
     })
     
-    app.get('/confirmedClasses', async(req, res)=>{
+    app.get('/confirmedClasses', verifyJWT, async(req, res)=>{
       let mail = req.query.email
       let filter = {email : mail}
       let result = await confirmedClassCollection.find(filter).toArray();
@@ -328,7 +359,7 @@ async function run() {
 
     // Payment APIS /////////////////////////////////////////////////////////////////////
 
-    app.post("/create-payment-intent", async (req, res) => {
+    app.post("/create-payment-intent", verifyJWT, async (req, res) => {
       const { price } = req.body;
 
       let fees = price * 100
@@ -349,13 +380,13 @@ async function run() {
       }
     });
 
-    app.post('/paymentHistory' , async (req, res)=>{
+    app.post('/paymentHistory' , verifyJWT, async (req, res)=>{
       let paymentDetails  = req.body;
       let result = await paymentHistoryCollection.insertOne(paymentDetails);
       res.send(result) 
     })
 
-    app.get('/paymentHistory', async (req, res)=>{
+    app.get('/paymentHistory', verifyJWT, async (req, res)=>{
       let mail = req.query.email
       let filter = {email : mail }
       let sort = {time: -1}
@@ -364,7 +395,7 @@ async function run() {
       res.send(result)
     })
    
-    app.get('/allPaymentHistory', async (req, res)=>{
+    app.get('/allPaymentHistory', verifyJWT, verifyAdmin, async (req, res)=>{
      
       let sort = {time: -1}
       let result = await paymentHistoryCollection.find().sort(sort).toArray();
