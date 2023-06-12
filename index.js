@@ -216,6 +216,14 @@ async function run() {
 
     })
 
+    app.post('/classesAsAdmin',verifyJWT, verifyAdmin, async (req, res)=>{
+      let newClass = req.body;
+      let result = await classCollection.insertOne(newClass)
+
+      res.send(result)
+
+    })
+
 
     app.get('/classes', verifyJWT, verifyAdmin, async (req, res)=>{
       let result = await classCollection.find().toArray()
